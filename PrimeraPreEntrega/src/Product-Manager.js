@@ -33,13 +33,10 @@ class ProductManager {
         console.log(newProduct);
         try {
             await fsPromises.mkdir(this.#productDirPath, { recursive: true });
-
-            // Intentar leer el archivo y manejar el error si no existe
             let productsFile;
             try {
                 productsFile = await fsPromises.readFile(this.#productsFilePath, "utf-8");
             } catch (readError) {
-                // Si hay un error de lectura, asumimos que el archivo no existe
                 productsFile = "[]";
             }
 
@@ -105,6 +102,33 @@ class ProductManager {
             throw Error(`Error buscando el producto por ID: ${productId}, detalle del error: ${error}`);
         }
     }
+    getProductByCode = async (productCode) => {
+        try {
+            await fsPromises.mkdir(this.#productDirPath, { recursive: true });
+            if (!fsPromises.access(this.#productsFilePath)) {
+                await fsPromises.writeFile(this.#productsFilePath, "[]");
+            }
+
+            let productsFile = await fsPromises.readFile(this.#productsFilePath, "utf-8");
+
+            this.#products = JSON.parse(productsFile);
+
+            const foundProduct = this.#products.find(product => product.code === productCode);
+
+            if (foundProduct) {
+                console.log("Producto encontrado:");
+                console.log(foundProduct);
+                return foundProduct;
+            } else {
+                console.log(`No se encontró ningún producto con el ID: ${productCode}`);
+                return null;
+            }
+        } catch (error) {
+            console.error(`Error buscando el producto por ID: ${productCode}, detalle del error: ${error}`);
+            throw Error(`Error buscando el producto por ID: ${productCode}, detalle del error: ${error}`);
+        }
+    }
+    
 
     updateProduct = async (productId, updatedAttributes)=>{
         try {

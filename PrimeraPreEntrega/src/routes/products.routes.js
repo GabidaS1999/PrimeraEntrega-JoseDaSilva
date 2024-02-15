@@ -45,6 +45,11 @@ router.post('/', async (req, res) => {
         if (!product.title || !product.description || !product.code || !product.price || !product.stock || !product.category || !product.thumbnails) {
             return res.status(400).send({ status: 'error', msg: 'Valores incompletos, revisar datos' });
         }
+         
+        const codeExists = await productManager.getProductByCode(product.code);
+        if (codeExists) {
+            return res.status(400).send({ status: 'error', msg: 'Código de producto duplicado' });
+        }
 
         await productManager.addProduct(product.title, product.description, product.price, product.thumbnails, product.code, product.stock);
         res.send({ status: 'success', msg: 'Producto creado' });
@@ -87,7 +92,7 @@ router.delete('/:pid', async (req, res) => {
     products.splice(productPosition, 1);
 
     try {
-        // Guarda la información actualizada en el archivo JSON después de la eliminación
+    
         await productManager.deleteProduct(productId)
         res.send({ status: "success", msg: "Producto eliminado" });
 

@@ -33,13 +33,7 @@ router.get('/:cid', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    console.log(req.body);
-    let cart = req.body
-
-    if (!cart.products) {
-        return res.status(400).send({ status: "error", msg: "Valores incompletos, revisar datos" })
-    }
-    await cartManager.createNewCart(cart)
+    let cart = await cartManager.createNewCart()
     carts.push(cart)
     res.send({ status: "success", msg: "Carrito creado" })
 })
